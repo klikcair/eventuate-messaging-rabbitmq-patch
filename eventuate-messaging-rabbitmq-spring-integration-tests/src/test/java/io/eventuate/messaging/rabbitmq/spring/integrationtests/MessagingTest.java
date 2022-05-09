@@ -91,7 +91,7 @@ public class MessagingTest extends AbstractMessagingTest {
     MessageConsumerRabbitMQImpl messageConsumerRabbitMQ = new MessageConsumerRabbitMQImpl(subscriptionIdSupplier,
             consumerIdSupplier.get(),
             coordinatorFactory,
-            eventuateRabbitMQConsumerConfigurationProperties.getBrokerAddresses(),
+            eventuateRabbitMQConsumerConfigurationProperties,
             partitionCount);
 
     return messageConsumerRabbitMQ;

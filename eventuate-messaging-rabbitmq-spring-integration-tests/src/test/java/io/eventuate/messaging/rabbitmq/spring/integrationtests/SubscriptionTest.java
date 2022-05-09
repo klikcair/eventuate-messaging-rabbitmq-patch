@@ -7,6 +7,7 @@ import com.rabbitmq.client.ConnectionFactory;
 import io.eventuate.coordination.leadership.LeaderSelectedCallback;
 import io.eventuate.messaging.partitionmanagement.Assignment;
 import io.eventuate.messaging.partitionmanagement.Coordinator;
+import io.eventuate.messaging.rabbitmq.spring.common.EventuateRabbitMQCommonConfigurationProperties;
 import io.eventuate.messaging.rabbitmq.spring.consumer.EventuateRabbitMQConsumerConfigurationProperties;
 import io.eventuate.messaging.rabbitmq.spring.consumer.EventuateRabbitMQConsumerConfigurationPropertiesConfiguration;
 import io.eventuate.messaging.rabbitmq.spring.consumer.Subscription;
@@ -21,6 +22,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
@@ -36,6 +39,8 @@ public class SubscriptionTest {
 
   @Autowired
   private EventuateRabbitMQProducer eventuateRabbitMQProducer;
+  
+  
 
   @Test
   public void leaderAssignedThenRevoked() throws Exception {
@@ -45,8 +50,8 @@ public class SubscriptionTest {
 
     ConcurrentLinkedQueue<Integer> concurrentLinkedQueue = new ConcurrentLinkedQueue<>();
 
-    ConnectionFactory factory = new ConnectionFactory();
-    Connection connection = factory.newConnection(eventuateRabbitMQConsumerConfigurationProperties.getBrokerAddresses());
+    ConnectionFactory factory = createConnectionFactory(eventuateRabbitMQConsumerConfigurationProperties);
+    Connection connection = factory.newConnection();
 
     //created subscribtion selected as leader, assigned all partition to it self
     CoordinationCallbacks coordinationCallbacks = createSubscription(connection, subscriberId, destination, concurrentLinkedQueue);
@@ -93,8 +98,8 @@ public class SubscriptionTest {
 
     ConcurrentLinkedQueue<Integer> concurrentLinkedQueue1 = new ConcurrentLinkedQueue<>();
 
-    ConnectionFactory factory = new ConnectionFactory();
-    Connection connection = factory.newConnection(eventuateRabbitMQConsumerConfigurationProperties.getBrokerAddresses());
+    ConnectionFactory factory = createConnectionFactory(eventuateRabbitMQConsumerConfigurationProperties);
+    Connection connection = factory.newConnection();
 
 
     CoordinationCallbacks coordinationCallbacks = createSubscription(connection, subscriberId, destination, concurrentLinkedQueue1);
@@ -121,6 +126,27 @@ public class SubscriptionTest {
     connection.close();
   }
 
+  private ConnectionFactory createConnectionFactory(EventuateRabbitMQCommonConfigurationProperties rabbitMqProperty) 
+			throws KeyManagementException, NoSuchAlgorithmException {
+		ConnectionFactory factory = new ConnectionFactory();
+		
+		factory.setHost(rabbitMqProperty.getBrokerHost());
+		factory.setPort(rabbitMqProperty.getBrokerPort());
+      factory.setUsername(rabbitMqProperty.getBrokerUsername());
+      factory.setPassword(rabbitMqProperty.getBrokerPassword());
+      factory.setVirtualHost(rabbitMqProperty.getBrokerVirtualHost());
+      
+      if(rabbitMqProperty.isBrokerSslEnabled()) {
+      	factory.useSslProtocol(rabbitMqProperty.getBrokerSslAlgorithm());
+      }
+      
+      factory.setAutomaticRecoveryEnabled(true);
+      factory.setNetworkRecoveryInterval(4000);
+      factory.setConnectionTimeout(10000);
+      
+      return factory;
+	}
+  
   private CoordinationCallbacks createSubscription(Connection connection, String subscriberId, String destination, ConcurrentLinkedQueue concurrentLinkedQueue) {
     CoordinationCallbacks coordinationCallbacks = new CoordinationCallbacks();
 

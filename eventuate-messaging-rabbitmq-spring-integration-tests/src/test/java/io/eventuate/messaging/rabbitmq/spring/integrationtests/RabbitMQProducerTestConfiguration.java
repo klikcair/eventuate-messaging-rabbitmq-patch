@@ -10,8 +10,9 @@ import org.springframework.context.annotation.Import;
 @Configuration
 @Import(EventuateRabbitMQProducerConfigurationPropertiesConfiguration.class)
 public class RabbitMQProducerTestConfiguration {
+	
   @Bean
   public EventuateRabbitMQProducer eventuateRabbitMQProducer(EventuateRabbitMQProducerConfigurationProperties properties) {
-    return new EventuateRabbitMQProducer(properties.getBrokerAddresses());
+    return new EventuateRabbitMQProducer(properties);
   }
 }
