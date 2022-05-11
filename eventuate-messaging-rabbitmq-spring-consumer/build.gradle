@@ -6,8 +6,8 @@ dependencies {
     compile "io.eventuate.common:eventuate-common-coordination-leadership:$eventuateCommonVersion"
     compile "io.eventuate.common.messaging:eventuate-messaging-partition-management:$eventuateMessagingPartitionManagementVersion"
 
-    compile('org.apache.curator:curator-framework:2.11.0')
-    compile('org.apache.curator:curator-recipes:2.11.0')
+    compile('org.apache.curator:curator-framework:5.2.1')
+    compile('org.apache.curator:curator-recipes:5.2.1')
     compile "io.eventuate.common:eventuate-common-coordination-leadership-zookeeper:$eventuateCommonVersion"
     compile "io.eventuate.common:eventuate-common-json-mapper:$eventuateCommonVersion"
     compile "io.eventuate.util:eventuate-util-test:$eventuateUtilVersion"
