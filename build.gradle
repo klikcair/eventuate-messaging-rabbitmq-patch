@@ -13,28 +13,34 @@ buildscript {
     }
 }
 
-apply plugin: 'maven-publish'
-apply plugin: 'docker-compose'
+plugins {
+    id "com.google.cloud.artifactregistry.gradle-plugin" version "2.1.5"
+}
 
 allprojects {
     group = "io.eventuate.messaging.rabbitmq"
 }
 
+apply plugin: 'maven-publish'
+apply plugin: 'docker-compose'
 apply plugin: "io.eventuate.plugins.gradle.publish.EventuatePublish"
 apply plugin: "io.eventuate.plugins.gradle.publish.EventuatePublishDockerImages"
 
 subprojects {
     apply plugin: 'java'
+    apply plugin: 'maven-publish'
+    apply plugin: 'com.google.cloud.artifactregistry.gradle-plugin'
 
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
-
-
-
+    
     repositories {
         mavenCentral()
         jcenter()
-        maven { url "https://repo.spring.io/milestone" }
+        maven { 
+            url "https://repo.spring.io/milestone"
+            url "artifactregistry://asia-southeast2-maven.pkg.dev/digital-community-bank/mvn-public-repo" 
+        }
         eventuateMavenRepoUrl.split(',').each { repoUrl -> maven { url repoUrl } }
     }
 
@@ -42,9 +48,6 @@ subprojects {
         testCompile "junit:junit:4.12"
         testCompile "org.mockito:mockito-core:2.23.4"
     }
-
-
-
 }
 
 gradle.projectsEvaluated {
