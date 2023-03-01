@@ -148,14 +148,14 @@ public class Subscription {
         logger.info("Leading subscription is creating exchanges and queues for channel {}. {}",
                 channelName, identificationInformation());
 
-        subscriberGroupChannel.exchangeDeclare(makeConsistentHashExchangeName(channelName, subscriberId), "x-consistent-hash");
+        subscriberGroupChannel.exchangeDeclare(makeConsistentHashExchangeName(channelName, subscriberId), "x-consistent-hash", true);
 
         for (int i = 0; i < partitionCount; i++) {
           subscriberGroupChannel.queueDeclare(makeConsistentHashQueueName(channelName, subscriberId, i), true, false, false, null);
           subscriberGroupChannel.queueBind(makeConsistentHashQueueName(channelName, subscriberId, i), makeConsistentHashExchangeName(channelName, subscriberId), "10");
         }
 
-        subscriberGroupChannel.exchangeDeclare(channelName, "fanout");
+        subscriberGroupChannel.exchangeDeclare(channelName, "fanout", true);
         subscriberGroupChannel.exchangeBind(makeConsistentHashExchangeName(channelName, subscriberId), channelName, "");
 
         logger.info("Leading subscription created exchanges and queues for channel {}. {}",
@@ -233,7 +233,7 @@ public class Subscription {
           String queue = makeConsistentHashQueueName(channelName, subscriberId, assignedPartition);
           String exchange = makeConsistentHashExchangeName(channelName, subscriberId);
 
-          consumerChannel.exchangeDeclare(exchange, "x-consistent-hash");
+          consumerChannel.exchangeDeclare(exchange, "x-consistent-hash", true);
           consumerChannel.queueDeclare(queue, true, false, false, null);
           consumerChannel.queueBind(queue, exchange, "10");
 
