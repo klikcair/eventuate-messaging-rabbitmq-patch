@@ -39,7 +39,7 @@ public class EventuateRabbitMQProducer {
 		try {
 			AMQP.BasicProperties bp = new AMQP.BasicProperties.Builder().headers(Collections.singletonMap("key", key)).build();
 
-			channel.exchangeDeclare(topic, "fanout");
+			channel.exchangeDeclare(topic, "fanout", true);
 			channel.basicPublish(topic, key, bp, body.getBytes("UTF-8"));
 
 		} catch (IOException e) {
